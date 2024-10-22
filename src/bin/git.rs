@@ -13,47 +13,50 @@ struct Cli {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    /// Initialize a new git repository in working directory.
+    /// Initialize a new git repository in the working directory.
     Init,
 
-    /// Provide contents or details of repository objects.
+    /// Display contents of a repository object.
     CatFile {
-        /// Pretty-print the contents of <object> based on its type
-        #[arg(short)]
+        /// Pretty-print the contents of the object
+        #[arg(short, default_value_t = false)]
         pretty_print: bool,
         /// The name of the object to show
         object: String,
     },
 
+    /// Compute and optionally write the hash of a file.
     HashObject {
         #[arg(short)]
         write_mode: bool,
-
-        file_path: PathBuf
+        /// Path to the file to hash
+        file_path: PathBuf,
     }
 }
 
 fn main() -> Result<()> {
     let args = Cli::parse();
 
-    match &args.command {
-        Some(Commands::Init) => {
-            repository::init_repository()
-        },
-        Some(Commands::CatFile {pretty_print, object}) => {
-            cat_file(object, pretty_print)
-        },
-        Some(Commands::HashObject {write_mode, file_path, }) => {
-            hash_object(file_path, write_mode)
+    if let Some(command) = args.command {
+        match command {
+            Commands::Init => repository::init_repository(),
+            Commands::CatFile { pretty_print, object } => {
+                cat_file(&object, pretty_print)
+            },
+            Commands::HashObject { write_mode, file_path } => {
+                hash_object(&file_path, write_mode)
+            },
         }
-        None => panic!("Must supply a command. Try -h (or --help) for help."),
+    } else {
+        // clap handles displaying help if no command is provided
+        println!("Must supply a command. Try -h (or --help) for help.");
     }
 }
 
-fn cat_file(object_name: &String, pretty_print: &bool) -> Result<()> {
+fn cat_file(object_name: &str, pretty_print: bool) -> Result<()> {
     let object: objects::Blob = object_name.try_into()?;
 
-    if *pretty_print {
+    if pretty_print {
         print!("{}", object.content)
     } else {
         print!("{:?}", object)
@@ -61,7 +64,7 @@ fn cat_file(object_name: &String, pretty_print: &bool) -> Result<()> {
     Ok(())
 }
 
-fn hash_object(path: &PathBuf, write_mode: &bool) -> Result<()> {
+fn hash_object(path: &PathBuf, write_mode: bool) -> Result<()> {
     let hash = objects::file_to_hash(path, write_mode)?;
     print!("{}", hash);
     Ok(())
