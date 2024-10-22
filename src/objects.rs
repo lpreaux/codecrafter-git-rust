@@ -1,8 +1,11 @@
 use anyhow::{anyhow, Result};
 use flate2::read::ZlibDecoder;
 use std::fs::File;
-use std::io::{BufReader, Read};
+use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::PathBuf;
+use flate2::Compression;
+use flate2::write::ZlibEncoder;
+use sha1::{Digest, Sha1};
 
 const BLOB_HEADER_PREFIX: &str = "blob ";
 const BLOB_CONTENT_SEPARATOR: &str = "\0";
@@ -81,6 +84,35 @@ impl TryFrom<&String> for Blob {
     }
 }
 
+impl TryFrom<&PathBuf> for Blob {
+    type Error = anyhow::Error;
+
+    fn try_from(path: &PathBuf) -> Result<Self> {
+        let file = File::open(path)?;
+        let mut reader = BufReader::new(file);
+        let mut file_data = Vec::new();
+        reader.read_to_end(&mut file_data)?;
+
+        let size = file_data.len();
+        let content = String::from_utf8(file_data).map_err(|_| anyhow!("Invalid UTF-8 in object file"))?;
+
+        let blob_data = format!("{}{}{}{}", BLOB_HEADER_PREFIX, size, BLOB_CONTENT_SEPARATOR, content);
+
+        let mut hasher = Sha1::new();
+        hasher.update(blob_data.as_bytes());
+        let unencoded_sha = hasher.finalize();
+        let hash = hex::encode(unencoded_sha);
+        let path = hash_to_object_path(&hash)?;
+
+        Ok(Blob {
+            hash,
+            _file_path: path,
+            size,
+            content,
+        })
+    }
+}
+
 /// Convertit un identifiant d'objet (hash) en un chemin d'accès à l'objet dans le répertoire Git.
 ///
 /// # Paramètres
@@ -100,4 +132,22 @@ fn hash_to_object_path(hash: &String) -> Result<PathBuf> {
     // Extraire le répertoire et le nom de fichier à partir du hash
     let (dir, file) = hash.split_at(2);
     Ok(PathBuf::from(GIT_OBJECTS_DIR).join(dir).join(file))
+}
+
+pub fn file_to_hash(path: &PathBuf, write_mode: &bool) -> Result<String> {
+    let object: Blob = path.try_into()?;
+    
+    if *write_mode {
+       write_object(&object)?;
+    }
+    
+    Ok(object.hash)
+}
+
+fn write_object(object: &Blob) -> Result<()> {
+    let writer = BufWriter::new(File::create(&object._file_path)?);
+    let mut encoder = ZlibEncoder::new(writer, Compression::default());
+    let blob_data = format!("{}{}{}{}", BLOB_HEADER_PREFIX, object.size, BLOB_CONTENT_SEPARATOR, object.content);
+    encoder.write_all(blob_data.as_bytes())?;
+    Ok(())
 }
