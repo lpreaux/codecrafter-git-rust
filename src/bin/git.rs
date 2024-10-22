@@ -49,7 +49,7 @@ fn main() -> Result<()> {
         }
     } else {
         // clap handles displaying help if no command is provided
-        println!("Must supply a command. Try -h (or --help) for help.");
+        Ok(println!("Must supply a command. Try -h (or --help) for help."))
     }
 }
 
