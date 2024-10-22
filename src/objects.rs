@@ -135,7 +135,7 @@ impl TryFrom<&str> for Blob {
     }
 }
 
-impl TryFrom<&PathBuf> for Blob {
+impl TryFrom<&Path> for Blob {
     type Error = anyhow::Error;
 
     /// Crée un objet Blob à partir d'un chemin de fichier.
@@ -145,7 +145,7 @@ impl TryFrom<&PathBuf> for Blob {
     ///
     /// # Renvoie
     /// - Un objet `Blob` avec les données extraites du fichier.
-    fn try_from(path: &PathBuf) -> Result<Self> {
+    fn try_from(path: &Path) -> Result<Self> {
         // Ouvre le fichier spécifié
         let file = File::open(path)?;
         let mut reader = BufReader::new(file);
