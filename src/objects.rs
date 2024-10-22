@@ -74,7 +74,7 @@ impl TryFrom<&String> for Blob {
         // Retourner la structure Blob
         Ok(Blob {
             hash: String::from(object_identifier),
-            file_path: path,
+            _file_path: path,
             size,
             content: blob_content.to_string(),
         })
