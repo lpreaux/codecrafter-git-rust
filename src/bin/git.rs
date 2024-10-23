@@ -2,13 +2,13 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use anyhow::Result;
 use codecrafters_git::repository;
-use codecrafters_git::objects;
+use codecrafters_git::objects::objects;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Commands,
 }
 
 #[derive(Subcommand, Debug)]
@@ -31,35 +31,45 @@ enum Commands {
         write_mode: bool,
         /// Path to the file to hash
         file_path: PathBuf,
+    },
+
+    LsTree {
+        #[arg(long)]
+        name_only: bool,
+        object: String,
     }
 }
 
 fn main() -> Result<()> {
     let args = Cli::parse();
 
-    if let Some(command) = args.command {
-        match command {
-            Commands::Init => repository::init_repository(),
-            Commands::CatFile { pretty_print, object } => {
-                cat_file(&object, pretty_print)
-            },
-            Commands::HashObject { write_mode, file_path } => {
-                hash_object(&file_path, write_mode)
-            },
-        }
-    } else {
-        // clap handles displaying help if no command is provided
-        Ok(println!("Must supply a command. Try -h (or --help) for help."))
+    match args.command {
+        Commands::Init => repository::init_repository(),
+        Commands::CatFile { pretty_print, object } => {
+            cat_file(&object, pretty_print)
+        },
+        Commands::HashObject { write_mode, file_path } => {
+            hash_object(&file_path, write_mode)
+        },
+        Commands::LsTree { name_only, object } => {
+            ls_tree(&object, name_only)
+        },
     }
 }
 
+fn ls_tree(object_name: &String, name_only: bool) -> Result<()> {
+    let object = objects::read_object(object_name)?;
+    println!("{}", object.get_data()?);
+    Ok(())
+}
+
 fn cat_file(object_name: &str, pretty_print: bool) -> Result<()> {
-    let object: objects::Blob = object_name.try_into()?;
+    let object = objects::read_object(object_name)?;
 
     if pretty_print {
-        print!("{}", object.content)
+        print!("{}", object.get_data()?)
     } else {
-        print!("{:?}", object)
+        // print!("{:?}", object)
     }
     Ok(())
 }
