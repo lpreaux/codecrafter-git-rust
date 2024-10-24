@@ -7,3 +7,4 @@ pub mod object_kind;
 mod object_writer;
 mod objet_reader;
 mod object_transformer;
+mod commit;

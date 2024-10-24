@@ -14,6 +14,7 @@ impl GitObjectWriter {
         match object {
             GitObjectKind::Blob(blob) => self.write_individual_object(blob),
             GitObjectKind::Tree(tree) => self.write_tree(tree),
+            GitObjectKind::Commit(commit) => self.write_individual_object(commit),
         }
     }
 
@@ -49,6 +50,7 @@ impl GitObjectWriter {
                 match object {
                     GitObjectKind::Blob(blob) => self.write_individual_object(blob)?,
                     GitObjectKind::Tree(sub_tree) => self.write_tree(sub_tree)?,
+                    GitObjectKind::Commit(commit) => self.write_individual_object(commit)?,
                 }
             }
         }

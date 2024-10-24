@@ -1,6 +1,3 @@
-use std::fs::{create_dir_all, File};
-use std::io::{BufWriter, Write};
-use std::path::{Path, PathBuf};
 use crate::objects::object_base::{GitObject, GitObjectBase};
 use crate::objects::object_kind::GitObjectKind;
 use crate::objects::{object_manager, utils};
@@ -89,14 +86,7 @@ impl GitObject for Tree {
     fn compute_object_data(&self) -> Vec<u8> {
         let header_str = self.get_header();
         let header = header_str.as_bytes();
-        let mut path = PathBuf::new();
-        path.push("tmp");
-        path.push(&self.base.hash);
-        if let Some(parent_dir) = path.parent() {
-            create_dir_all(parent_dir).unwrap();
-        }
-        let mut writer = BufWriter::new(File::create(path).unwrap());
-        writer.write(self.compute_size().to_string().as_bytes()).expect("TODO: panic message");
+
         let mut result = Vec::with_capacity(header.len() + self.compute_size());
 
         result.extend_from_slice(&header);

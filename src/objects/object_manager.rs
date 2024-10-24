@@ -5,6 +5,7 @@ use crate::objects::object_writer::GitObjectWriter;
 use crate::objects::objet_reader::GitObjectReader;
 use anyhow::Result;
 use std::path::Path;
+use crate::objects::commit::commit::Commit;
 
 pub(crate) const OBJECT_CONTENT_SEPARATOR: u8 = 0;
 pub(crate) const OBJECT_HASH_SIZE: usize = 40;
@@ -26,8 +27,11 @@ pub fn create_object(path: &Path) -> Result<GitObjectKind> {
     Ok(object)
 }
 
+pub fn create_commit(tree_hash: &String, parent_hash: &Option<String>, message: &String) -> Result<GitObjectKind> {
+    let writer = GitObjectWriter;
 
+    let commit = GitObjectKind::Commit(Commit::new(tree_hash, parent_hash, message, None)?);
+    writer.write_object(&commit)?;
 
-
-
-
+    Ok(commit)
+}

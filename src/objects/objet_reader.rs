@@ -7,6 +7,7 @@ use anyhow::{anyhow, Result};
 use flate2::read::ZlibDecoder;
 use std::fs::File;
 use std::io::{BufReader, Read};
+use crate::objects::commit::commit::Commit;
 
 pub struct GitObjectReader;
 
@@ -42,6 +43,10 @@ impl GitObjectReader {
                 let tree = Tree::from_object_file(hash, content)?;
                 Ok(GitObjectKind::Tree(tree))
             },
+            "commit" => {
+                let commit = Commit::from_object_file(hash, content)?;
+                Ok(GitObjectKind::Commit(commit))
+            }
             _ => Err(anyhow!("Unsupported object type: {}", object_kind)),
         }
     }

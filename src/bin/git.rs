@@ -44,7 +44,15 @@ enum Commands {
     WriteTree {
         #[arg(default_value_os_t = get_working_dir_path())]
         path: PathBuf,
-    }
+    },
+
+    CommitTree {
+        object: String,
+        #[arg(short, long)]
+        parent: Option<String>,
+        #[arg(short, long)]
+        message: String,
+    },
 }
 
 fn main() -> Result<()> {
@@ -54,17 +62,26 @@ fn main() -> Result<()> {
         Commands::Init => repository::init_repository(),
         Commands::CatFile { pretty_print, object } => {
             cat_file(&object, pretty_print)
-        },
+        }
         Commands::HashObject { write_mode, file_path } => {
             hash_object(&file_path, write_mode)
-        },
+        }
         Commands::LsTree { name_only, object } => {
             ls_tree(&object, name_only)
-        },
-        Commands::WriteTree { path} => {
+        }
+        Commands::WriteTree { path } => {
             write_tree(&path)
+        },
+        Commands::CommitTree { object, parent, message } => {
+            commit_tree(&object, &parent, &message)
         }
     }
+}
+
+fn commit_tree(object_name: &String, parent_name: &Option<String>, message: &String) -> Result<()> {
+    let object = object_manager::create_commit(object_name, parent_name, message)?;
+    println!("{}", object.get_hash());
+    Ok(())
 }
 
 fn ls_tree(object_name: &String, name_only: bool) -> Result<()> {

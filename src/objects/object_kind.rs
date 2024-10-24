@@ -2,12 +2,13 @@ use crate::objects::blob::blob::Blob;
 use crate::objects::object_base::GitObject;
 use crate::objects::tree::tree::Tree;
 use anyhow::Result;
+use crate::objects::commit::commit::Commit;
 
 #[derive(Debug)]
 pub enum GitObjectKind {
     Blob(Blob),
     Tree(Tree),
-    // Commit(Commit),  // Si vous voulez ajouter d'autres types à l'avenir
+    Commit(Commit),
 }
 
 impl GitObjectKind {
@@ -19,6 +20,9 @@ impl GitObjectKind {
                     .map(|entry| format!("{}", entry.name))
                     .collect();
                 entries.join("\n")
+            },
+            GitObjectKind::Commit(commit) => {
+                todo!()
             }
         };
         Ok(data)
@@ -30,7 +34,7 @@ impl GitObject for GitObjectKind {
         match self {
             GitObjectKind::Blob(blob) => blob.get_hash(),
             GitObjectKind::Tree(tree) => tree.get_hash(),
-            // GitObjectKind::Commit(commit) => &commit.base.hash,
+            GitObjectKind::Commit(commit) => commit.get_hash(),
         }
     }
 
@@ -38,7 +42,7 @@ impl GitObject for GitObjectKind {
         match self {
             GitObjectKind::Blob(blob) => blob.get_header_prefix(),
             GitObjectKind::Tree(tree) => tree.get_header_prefix(),
-            // GitObjectKind::Commit(commit) => &commit.base.hash,
+            GitObjectKind::Commit(commit) => commit.get_header_prefix(),
         }
     }
 
@@ -46,7 +50,7 @@ impl GitObject for GitObjectKind {
         match self {
             GitObjectKind::Blob(blob) => blob.compute_size(),
             GitObjectKind::Tree(tree) => tree.compute_size(),
-            // GitObjectKind::Commit(commit) => &commit.base.hash,
+            GitObjectKind::Commit(commit) => commit.compute_size(),
         }
     }
 
@@ -54,6 +58,7 @@ impl GitObject for GitObjectKind {
         match self {
             GitObjectKind::Blob(blob) => blob.compute_object_data(),
             GitObjectKind::Tree(tree) => tree.compute_object_data(),
+            GitObjectKind::Commit(commit) => commit.compute_object_data(),
         }
     }
 
