@@ -3,6 +3,7 @@ use crate::objects::object_base::GitObject;
 use crate::objects::tree::tree::Tree;
 use anyhow::Result;
 
+#[derive(Debug)]
 pub enum GitObjectKind {
     Blob(Blob),
     Tree(Tree),
@@ -56,7 +57,7 @@ impl GitObject for GitObjectKind {
         }
     }
 
-    fn from_data(_hash: &str, _content: &[u8]) -> Result<Self>
+    fn from_object_file(_hash: &str, _content: &[u8]) -> Result<Self>
     where
         Self: Sized,
     {

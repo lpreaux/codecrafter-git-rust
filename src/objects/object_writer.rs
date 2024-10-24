@@ -1,14 +1,23 @@
+use crate::objects::object_base::GitObject;
+use crate::objects::object_kind::GitObjectKind;
+use crate::objects::tree::tree::Tree;
+use anyhow::Result;
+use flate2::write::ZlibEncoder;
+use flate2::Compression;
 use std::fs::{create_dir_all, File};
 use std::io::{BufWriter, Write};
-use crate::objects::object_base::GitObject;
-use anyhow::Result;
-use flate2::Compression;
-use flate2::write::ZlibEncoder;
 
 pub struct GitObjectWriter;
 
 impl GitObjectWriter {
-    pub fn write_object<T: GitObject>(object: &T) -> Result<()> {
+    pub fn write_object(&self, object: &GitObjectKind) -> Result<()> {
+        match object {
+            GitObjectKind::Blob(blob) => self.write_individual_object(blob),
+            GitObjectKind::Tree(tree) => self.write_tree(tree),
+        }
+    }
+
+    fn write_individual_object<T: GitObject>(&self, object: &T) -> Result<()> {
         let object_data = object.compute_object_data();
 
         let path = object.compute_file_path()?;
@@ -32,5 +41,19 @@ impl GitObjectWriter {
         encoder.finish()?;
 
         Ok(())
+    }
+
+    fn write_tree(&self, tree: &Tree) -> Result<()> {
+        for entry in &tree.entries {
+            if let Some(object) = &entry.object {
+                match object {
+                    GitObjectKind::Blob(blob) => self.write_individual_object(blob)?,
+                    GitObjectKind::Tree(sub_tree) => self.write_tree(sub_tree)?,
+                }
+            }
+        }
+
+        // Sauvegarde du Tree lui-même
+        self.write_individual_object(tree)
     }
 }

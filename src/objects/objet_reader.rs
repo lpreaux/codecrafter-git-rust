@@ -34,12 +34,12 @@ impl GitObjectReader {
         match object_kind.as_str() {
             "blob" => {
                 // Crée un objet Blob à partir des données
-                let blob = Blob::from_data(hash, content)?;
+                let blob = Blob::from_object_file(hash, content)?;
                 Ok(GitObjectKind::Blob(blob))
             },
             "tree" => {
                 // Crée un objet Tree à partir des données
-                let tree = Tree::from_data(hash, content)?;
+                let tree = Tree::from_object_file(hash, content)?;
                 Ok(GitObjectKind::Tree(tree))
             },
             _ => Err(anyhow!("Unsupported object type: {}", object_kind)),

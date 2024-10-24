@@ -53,7 +53,7 @@ To make this easier to type out, you could add a
 [shell alias](https://shapeshed.com/unix-alias/):
 
 ```sh
-alias mygit=/path/to/your/repo/your_program.sh
+alias mygit="/Volumes/Extreme SSD/Perso/Projects/codecrafters-git-rust/your_program.sh"
 
 mkdir -p /tmp/testing && cd /tmp/testing
 mygit init

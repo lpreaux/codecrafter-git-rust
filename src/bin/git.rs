@@ -1,8 +1,10 @@
+use std::env;
 use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use anyhow::Result;
+use codecrafters_git::objects::object_base::GitObject;
 use codecrafters_git::repository;
-use codecrafters_git::objects::objects;
+use codecrafters_git::objects::object_manager;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -37,6 +39,11 @@ enum Commands {
         #[arg(long)]
         name_only: bool,
         object: String,
+    },
+
+    WriteTree {
+        #[arg(default_value_os_t = get_working_dir_path())]
+        path: PathBuf,
     }
 }
 
@@ -54,17 +61,26 @@ fn main() -> Result<()> {
         Commands::LsTree { name_only, object } => {
             ls_tree(&object, name_only)
         },
+        Commands::WriteTree { path} => {
+            write_tree(&path)
+        }
     }
 }
 
 fn ls_tree(object_name: &String, name_only: bool) -> Result<()> {
-    let object = objects::read_object(object_name)?;
+    let object = object_manager::read_object(object_name)?;
     println!("{}", object.get_data()?);
     Ok(())
 }
 
+fn write_tree(path: &PathBuf) -> Result<()> {
+    let object = object_manager::create_object(path)?;
+    println!("{}", object.get_hash());
+    Ok(())
+}
+
 fn cat_file(object_name: &str, pretty_print: bool) -> Result<()> {
-    let object = objects::read_object(object_name)?;
+    let object = object_manager::read_object(object_name)?;
 
     if pretty_print {
         print!("{}", object.get_data()?)
@@ -75,7 +91,11 @@ fn cat_file(object_name: &str, pretty_print: bool) -> Result<()> {
 }
 
 fn hash_object(path: &PathBuf, write_mode: bool) -> Result<()> {
-    let hash = objects::file_to_hash(path, write_mode)?;
-    print!("{}", hash);
+    let object = object_manager::create_object(path)?;
+    print!("{}", object.get_hash());
     Ok(())
+}
+
+fn get_working_dir_path() -> PathBuf {
+    env::current_dir().unwrap()
 }
