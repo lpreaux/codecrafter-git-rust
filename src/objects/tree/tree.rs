@@ -101,8 +101,6 @@ impl GitObject for Tree {
 
         result.extend_from_slice(&header);
 
-        result.push(0);
-
         // Ajouter chaque entrée du tree
         self.entries.iter().for_each(|entry| {
             // Ajouter le mode (comme "100644" ou "040000")

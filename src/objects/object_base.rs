@@ -11,7 +11,7 @@ pub trait GitObject {
     fn get_hash(&self) -> &str;
     fn get_header_prefix(&self) -> &'static str;
     fn get_header(&self) -> String {
-        format!("{} {}", self.get_header_prefix(), self.compute_size())
+        format!("{} {}\0", self.get_header_prefix(), self.compute_size())
     }
     fn compute_file_path(&self) -> Result<PathBuf> {
         if self.get_hash().len() != object_manager::OBJECT_HASH_SIZE {
