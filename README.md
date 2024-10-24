@@ -1,60 +1,79 @@
-[![progress-banner](https://backend.codecrafters.io/progress/git/c9ea89fa-af0b-4af3-907c-2a7262b1b763)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# Build Your Own Git - Rust Implementation
 
-This is a starting point for Rust solutions to the
-["Build Your Own Git" Challenge](https://codecrafters.io/challenges/git).
+![progress-banner](https://backend.codecrafters.io/progress/git/c9ea89fa-af0b-4af3-907c-2a7262b1b763)
 
-In this challenge, you'll build a small Git implementation that's capable of
-initializing a repository, creating commits and cloning a public repository.
-Along the way we'll learn about the `.git` directory, Git objects (blobs,
-commits, trees etc.), Git's transfer protocols and more.
+Welcome to my **Rust-based implementation** of Git, built as part of the ["Build Your Own Git" Challenge](https://codecrafters.io/challenges/git) on CodeCrafters.io.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+## 🚀 Challenge Overview
 
-# Passing the first stage
+This project is an opportunity to explore the inner workings of Git, one of the most widely used version control systems in software development. Throughout this challenge, I’ve implemented a simplified version of Git from scratch using **Rust**, focusing on core functionalities such as:
 
-The entry point for your Git implementation is in `src/main.rs`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
+- Initializing a Git repository (`.git` directory)
+- Handling **blob** objects (create and read)
+- Handling **tree** objects (create and read)
+- Creating **commits**
+- Cloning a public GitHub repository
 
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
-```
+By the end of the challenge, my Git implementation will be capable of performing many fundamental Git operations. This has been an excellent learning experience in both **Rust programming** and **Git internals**.
 
-That's all!
+## 🏁 Current Progress
 
-# Stage 2 & beyond
+I have successfully completed **6 out of 7 stages** in the challenge. Below are the key stages:
 
-Note: This section is for stages 2 and beyond.
+1. **Initialize the .git directory** - ✅
+2. **Read a blob object** - ✅
+3. **Create a blob object** - ✅
+4. **Read a tree object** - ✅
+5. **Write a tree object** - ✅
+6. **Create a commit** - ✅
+7. **Clone a repository** - In Progress
 
-1. Ensure you have `cargo (1.80)` installed locally
-1. Run `./your_program.sh` to run your Git implementation, which is implemented
-   in `src/main.rs`. This command compiles your Rust project, so it might be
-   slow the first time you run it. Subsequent runs will be fast.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+Each step has deepened my understanding of the way Git operates under the hood, especially how it manages and stores different objects (blobs, trees, commits) and the challenges related to handling them efficiently in Rust.
 
-# Testing locally
+## 🧑‍💻 How to Run
 
-The `your_program.sh` script is expected to operate on the `.git` folder inside
-the current working directory. If you're running this inside the root of this
-repository, you might end up accidentally damaging your repository's `.git`
-folder.
+You can experiment with this project locally. The entry point is located in `src/bin/git.rs`. Here's how you can get started:
 
-We suggest executing `your_program.sh` in a different folder when testing
-locally. For example:
+1. Ensure you have **cargo (>=1.80)** installed.
+2. Build and run the project with the following commands:
+
+    ```sh
+    cargo build
+    cargo run -- init
+    ```
+
+3. You can also use the option `-h` or `--help` to get more detailed documentation and usage information:
+
+    ```sh
+    cargo run -- -h
+    ```
+
+4. To avoid any accidental changes to your Git repository during local testing, it’s recommended to test the program in a separate directory:
+
+    ```sh
+    mkdir -p /tmp/testing && cd /tmp/testing
+    cargo run -- init
+    ```
+
+## 🧪 Testing
+
+For safety, execute the program in a different folder to prevent modifying the `.git` folder of this project:
 
 ```sh
 mkdir -p /tmp/testing && cd /tmp/testing
-/path/to/your/repo/your_program.sh init
+cargo run -- init
 ```
 
-To make this easier to type out, you could add a
-[shell alias](https://shapeshed.com/unix-alias/):
+## 🎯 Future Improvements
 
-```sh
-alias mygit="/Volumes/Extreme SSD/Perso/Projects/codecrafters-git-rust/your_program.sh"
+- Completing the final step: **Cloning a repository**
+- Adding more test cases to ensure the robustness of the implementation
+- Improving the error handling and performance of the Rust code
 
-mkdir -p /tmp/testing && cd /tmp/testing
-mygit init
-```
+## 🔧 Technologies Used
+
+- **Rust**: The core programming language used to build the project
+- **Git**: The system being implemented
+- **CodeCrafters.io**: The platform providing the challenge
+
+Feel free to explore, or reach out for any questions!
