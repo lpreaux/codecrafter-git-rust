@@ -14,7 +14,7 @@ This project is an opportunity to explore the inner workings of Git, one of the 
 - Creating **commits**
 - Cloning a public GitHub repository
 
-By the end of the challenge, my Git implementation will be capable of performing many fundamental Git operations. This has been an excellent learning experience in both **Rust programming** and **Git internals**.
+This repository is a six-stage learning implementation rather than a drop-in replacement for Git. It has been an excellent way to explore both **Rust programming** and **Git internals**.
 
 ## 🏁 Current Progress
 
@@ -26,9 +26,18 @@ I have successfully completed **6 out of 7 stages** in the challenge. Below are 
 4. **Read a tree object** - ✅
 5. **Write a tree object** - ✅
 6. **Create a commit** - ✅
-7. **Clone a repository** - In Progress
+7. **Clone a repository** - Not implemented in this snapshot
 
 Each step has deepened my understanding of the way Git operates under the hood, especially how it manages and stores different objects (blobs, trees, commits) and the challenges related to handling them efficiently in Rust.
+
+## 🔍 Implementation Choices
+
+- **Git-compatible object IDs:** blobs, trees and commits are prefixed with their object type and byte length before being hashed with SHA-1.
+- **Loose-object storage:** object contents are compressed with zlib and stored below `.git/objects`, using the first two hexadecimal characters of the hash as the directory name.
+- **Binary tree entries:** trees encode the file mode, name, NUL separator and raw 20-byte object ID instead of a textual representation.
+- **Recursive working-tree traversal:** `write-tree` converts files to blobs and directories to trees, then writes the resulting object graph from the leaves upward.
+
+The clone stage is deliberately not claimed here: this version does not yet negotiate with a remote or decode packfiles.
 
 ## 🧑‍💻 How to Run
 
@@ -66,7 +75,7 @@ cargo run -- init
 
 ## 🎯 Future Improvements
 
-- Completing the final step: **Cloning a repository**
+- Implementing the final **clone** stage, including smart-HTTP negotiation and packfile decoding
 - Adding more test cases to ensure the robustness of the implementation
 - Improving the error handling and performance of the Rust code
 
